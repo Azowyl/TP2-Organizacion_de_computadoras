@@ -34,12 +34,20 @@ bool cache_contains_block(cache_t* self, metadata_t* metadata) {
 bool cache_read_block(cache_t* self, metadata_t* metadata, void* data) {
 	self->access++;
 
-	if (cache_contains_block(self, metadata)) {
-		set_t* set = self->sets[metadata_get_index(metadata)];
-		block_t* block = set_get_block(set, metadata_get_tag(metadata));
-		data = block_get_data(block);
-		return true;
+	int index = metadata_get_index(metadata);
+	if (index < 0 || index > set_count){
+		return false;
 	}
+
+	block_t* block = set_get_block(self->sets[index], metadata_get_tag(metadata));
+
+	if (block) {
+		if (block_get_valid(block)) {
+			data = block_get_data(block);
+			return true;	
+		}
+	}
+
 	self->misses++;
 	return false;
 }

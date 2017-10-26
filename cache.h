@@ -25,10 +25,6 @@ int cache_create(cache_t* self);
 // Pre: self inicializada con cache_create
 int cache_destroy(cache_t* self);
 
-// retorna true si contiene el bloque con el tag, false en caso contrario
-// Pre: self inicializada con cache_create
-bool cache_contains_block(cache_t* self, metadata_t* metadata);
-
 // carda en data, la informacion del bloque direcciondo por info.
 // retorna true si data fue cargada, false en caso contrario
 // Pre: self inicializada con cache_create,
