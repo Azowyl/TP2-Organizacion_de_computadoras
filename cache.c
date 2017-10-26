@@ -23,14 +23,6 @@ int cache_destroy(cache_t* self) {
 	return SUCESS;
 }	
 
-bool cache_contains_block(cache_t* self, metadata_t* metadata) {
-	int index = metadata_get_index(metadata);
-	if (index < 0 || index > set_count){
-		return false;
-	}
-	return (set_get_block(self->sets[index], metadata_get_tag(metadata)) != NULL);
-}
-
 bool cache_read_block(cache_t* self, metadata_t* metadata, void* data) {
 	self->access++;
 
