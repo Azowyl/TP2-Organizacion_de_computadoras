@@ -21,19 +21,15 @@ typedef struct {
 
 // inicializa self con metadata
 // Pre: self apunta a un sector valido de memoria
-// metadata debe contener 16 caracters binarios que corresponden
-// a tag, index y block offset
 int metadata_create(metadata_t* self, unsigned short int address);
 
 // inicializa self
 // Pre: self inicializada con metadata_create
 int metadata_destroy(metadata_t* self);
 
-// compara el tag, retorna true si son el mismo, false en caso contrario
 // Pre: self inicializada con metadata_create
 int metadata_get_tag(metadata_t* self);
 
-// compara el indice, retorna true si son el mismo, false en caso contrario
 // Pre: self inicializada con metadata_create
 int metadata_get_index(metadata_t* self);
 
