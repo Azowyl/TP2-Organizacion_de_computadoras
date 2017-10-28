@@ -23,28 +23,47 @@ int cache_destroy(cache_t* self) {
 	return SUCESS;
 }	
 
-bool cache_read_block(cache_t* self, metadata_t* metadata, void* data) {
+int cache_read_data(cache_t* self, metadata_t* metadata, char* data) {
 	self->access++;
 
 	int index = metadata_get_index(metadata);
-	if (index < 0 || index > set_count){
-		return false;
+	if (index < 0 || index > set_count) {
+		return ERROR;
 	}
 
 	block_t* block = set_get_block(self->sets[index], metadata_get_tag(metadata));
 
 	if (block) {
-		if (block_get_valid(block)) {
-			data = block_get_data(block);
-			return true;	
+		if (block_get_valid_bit(block)) {
+			block_get_data(block, metadata_get_offset(metadata), data);
+			return HIT;	
 		}
 	}
-
+	// MISS
 	self->misses++;
-	return false;
+	// pedir blocke a la memoria
+	set_insert_block(self->sets[index], block);
+	block_get_data(block, metadata_get_offset(metadata), data);
+	return MISS;
 }
 
-int cache_write_block(cache_t* self, metadata_t* info, void* data) {
-	// TODO
-	return 0;
+int cache_write_block(cache_t* self, metadata_t* metadata, char* data) {
+	self->access++;
+
+	int index = metadata_get_index(metadata);
+	if (index < 0 || index > set_count) {
+		return ERROR;
+	}
+
+	block_t* block = set_get_block(self->sets[index], metadata_get_tag(metadata));
+	if (block) {
+		block_set_data(block, data);
+		return HIT;
+	} else {
+		self->misses++;
+		// pedir blocke a la memoria
+		set_insert_block(self->sets[index], block); // Write Allocate
+		block_set_data(block, data);
+		return MISS;
+	}
 }

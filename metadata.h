@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define metadata_bit_count 32
+#define metadata_bit_count 16
 
 #define tag_size 5
 #define index_size 9

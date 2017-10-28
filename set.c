@@ -1,15 +1,10 @@
 #include "set.h"
 
 int set_create(set_t* self, int index) {
-	for (int i = 0; i < block_count; i++) {
-		self->blocks[i] = (block_t*) malloc(sizeof(block_t));
-		if (!self->blocks[i]) {
-			fprintf(stderr, "%s%d\n", "Error al asingar memoria para el bloque: ", i);
-		} else {
-			block_create(self->blocks[i]);		
-		}
-	}
 	self-> index = index;
+	for (int i = 0; i < block_count; i++) {
+		self->blocks[i] = NULL;
+	}
 	return SUCESS;
 }
 
@@ -27,8 +22,36 @@ int set_destroy(set_t* self) {
 block_t* set_get_block(set_t* self, int tag) {
 	for (int i = 0; i < block_count; i++) {
 		if (block_get_tag(self->blocks[i]) == tag) {
+			self->last_recent_used = i;
 			return self->blocks[i];
 		}
 	}
 	return NULL;
+}
+
+int set_insert_block(set_t* self, block_t* block) {
+	for (int i = 0; i < block_count; i++) {
+		if (!self->blocks[i]) {
+
+			block_destroy(self->blocks[i]);
+			free(self->blocks[i]);
+
+			self->blocks[i] = (block_t*) malloc(sizeof(block_t));
+			memcpy(self->blocks[i], block, sizeof(block_t));
+			return SUCESS;
+		}
+	}
+
+	// LRU
+	int index;
+	if (self->last_recent_used == 0) {
+		// remplaza el segundo
+		index = 1;
+	} else { index = 0; }
+
+	// Write Back
+	if (block_get_dirty_bit(self->blocks[index])) { /*escribirlo en memoria*/ }
+	block_destroy(self->blocks[index]);
+	memcpy(self->blocks[index], block, sizeof(block_t));
+	return SUCESS;
 }

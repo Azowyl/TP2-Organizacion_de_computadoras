@@ -10,9 +10,12 @@
 
 #define block_count 2 // 2WSA
 
+//extern memory_t memory;
+
 typedef struct {
 	int index;
 	block_t* blocks[block_count];
+	int last_recent_used;
 } set_t;
 
 // inicializa la estructura para ser utilziada
@@ -27,5 +30,7 @@ int set_destroy(set_t* self);
 // NULL si no contiene un bloque con el tag especificado
 // Pre: self inicializada con set_create
 block_t* set_get_block(set_t* self, int tag);
+
+int set_insert_block(set_t* self, block_t* block);
 
 #endif /* __SET_H__ */

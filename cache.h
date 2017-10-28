@@ -11,6 +11,11 @@
 
 #define set_count 512 // cache 2WSA de 4KB con bloques de 4B
 
+#define HIT 0
+#define MISS -2
+
+//extern memory_t memory;
+
 typedef struct {
 	int access;
 	int misses;
@@ -29,12 +34,15 @@ int cache_destroy(cache_t* self);
 // retorna true si data fue cargada, false en caso contrario
 // Pre: self inicializada con cache_create,
 // info contiene tag, index, y block offset
-bool cache_read_block(cache_t* self, metadata_t* info, void* data);
+// data apunta a un sector valido de memoria
+int cache_read_data(cache_t* self, metadata_t* info, char* data);
 
 // guarda en el bloque identificado por info, los bytes de data.
 // retorna true si data fue guardada, false en caso contrario
 // Pre: self inicializada con cache_create,
 // info contiene tag, index, y block offset
-int cache_write_block(cache_t* self, metadata_t* info, void* data);
+int cache_write_block(cache_t* self, metadata_t* info, char* data);
+
+int cache_insert_block(cache_t* self, metadata_t* info, block_t* block);
 
 #endif /* __CACHE_H__ */
