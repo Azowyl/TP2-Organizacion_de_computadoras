@@ -10,11 +10,12 @@
 #include "set.h"
 
 #define set_count 512 // cache 2WSA de 4KB con bloques de 4B
+#define memory_size 65536 // 64K
 
 #define HIT 0
 #define MISS -2
 
-extern char* memory;
+extern char memory[memory_size];
 
 typedef struct {
 	int access;

@@ -15,9 +15,9 @@ void init() {
 int read_byte(int address) {
 	char byte_readed;
 	metadata_t metadata;
-	metadata_create(address);
+	metadata_create(&metadata, address);
 
-	int result = cache_read_data(&cache, metadata, &byte_readed);
+	int result = cache_read_data(&cache, &metadata, &byte_readed);
 	if (result == HIT) {
 		return (int)byte_readed; // <-- esto no se si esta bien
 	}
@@ -27,9 +27,9 @@ int read_byte(int address) {
 
 int write_byte(int address, char value) {
 	metadata_t metadata;
-	metadata_create(address);
+	metadata_create(&metadata, address);
 
-	int result = cache_write_data(&cache, metadata, &value);
+	int result = cache_write_data(&cache, &metadata, &value);
 	if (result == HIT) {
 		return 0;
 	}
@@ -42,6 +42,9 @@ int get_miss_rate() {
 }
 
 int main(int argc, char* argv[]) { 
+	init();
+	write_byte(0, 1);
+	printf("%d\n", read_byte(0));
 	/* Leer archivo parsear y operar */
 	return 0;
 }

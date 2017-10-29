@@ -10,8 +10,9 @@
 #include "metadata.h"
 
 #define block_count 2 // 2WSA
+#define memory_size 65536 // 64K
 
-extern char* memory;
+extern char memory[memory_size];
 
 typedef struct {
 	int index;

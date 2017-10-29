@@ -66,21 +66,20 @@ int cache_write_data(cache_t* self, metadata_t* metadata, char* data) {
 		block_set_dirty(block, true);
 		return HIT;
 	} else {
+		// MISS
 		self->misses++;
 
 		block = (block_t*) malloc(sizeof(block_t));
 		block_create(block, metadata_get_tag(metadata));
-		block_set_data(block, &memory[metadata_get_address(metadata)]);
-		set_insert_block(self->sets[index], block); // Write Allocate
-		block_destroy(block);
-		free(block);
-		block = set_get_block(self->sets[index], metadata_get_tag(metadata));
 		block_set_data(block, data);
 		block_set_dirty(block, true);
+		set_insert_block(self->sets[index], block); // Write Allocate
+		free(block);
+		
 		return MISS;
 	}
 }
 
 int cache_get_miss_rate(cache_t* self) {
-	return ((float)(self->misses / self->access))* 100;
+	return (self->misses / self->access) * 100;
 }
