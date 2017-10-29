@@ -7,10 +7,11 @@
 #include <string.h>
 
 #include "block.h"
+#include "metadata.h"
 
 #define block_count 2 // 2WSA
 
-//extern memory_t memory;
+extern char* memory;
 
 typedef struct {
 	int index;

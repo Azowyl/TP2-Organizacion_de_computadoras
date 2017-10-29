@@ -23,3 +23,19 @@ int metadata_get_offset(metadata_t* self) {
 
 	return (offset >> (index_size + tag_size));
 }
+
+unsigned short int metadata_get_address(metadata_t* self) {
+	return self->metadata;
+}
+
+int metadata_build(int tag, int index, int offset) {
+	unsigned short int address = tag;
+	address = address << (offset_size + index_size);
+
+	address += index;
+	address = address << offset_size;	
+
+	address += offset;
+
+	return address;
+}

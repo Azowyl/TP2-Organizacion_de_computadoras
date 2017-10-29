@@ -14,7 +14,7 @@
 #define HIT 0
 #define MISS -2
 
-//extern memory_t memory;
+extern char* memory;
 
 typedef struct {
 	int access;
@@ -31,18 +31,20 @@ int cache_create(cache_t* self);
 int cache_destroy(cache_t* self);
 
 // carda en data, la informacion del bloque direcciondo por info.
-// retorna true si data fue cargada, false en caso contrario
+// retorna HIT o MISS dependiendo si estaba o no el bloque en cache
 // Pre: self inicializada con cache_create,
 // info contiene tag, index, y block offset
 // data apunta a un sector valido de memoria
 int cache_read_data(cache_t* self, metadata_t* info, char* data);
 
-// guarda en el bloque identificado por info, los bytes de data.
-// retorna true si data fue guardada, false en caso contrario
+// guarda en el bloque identificado por info, 4 bytes comenzando desde data.
+// retorna HIT o MISS dependiendo si estaba o no el bloque en cache
 // Pre: self inicializada con cache_create,
 // info contiene tag, index, y block offset
-int cache_write_block(cache_t* self, metadata_t* info, char* data);
+int cache_write_data(cache_t* self, metadata_t* info, char* data);
 
-int cache_insert_block(cache_t* self, metadata_t* info, block_t* block);
+// retorna el miss rate como el cociente entre misses y access
+// Pre: self inicializada con cache_create
+int cache_get_miss_rate(cache_t* self);
 
 #endif /* __CACHE_H__ */

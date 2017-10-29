@@ -37,4 +37,10 @@ int metadata_get_index(metadata_t* self);
 // Pre: self inicializada con metadata_create
 int metadata_get_offset(metadata_t* self);
 
+// Pre: self inicializada con metadata_create
+unsigned short int metadata_get_address(metadata_t* self);
+
+// construye una direccion a partir de los parametros
+int metadata_build(int tag, int index, int offset);
+
 #endif /* __METADATA_H__ */
