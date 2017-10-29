@@ -63,6 +63,7 @@ int cache_write_data(cache_t* self, metadata_t* metadata, char* data) {
 	block_t* block = set_get_block(self->sets[index], metadata_get_tag(metadata));
 	if (block) {
 		block_set_data(block, data);
+		block_set_dirty(block, true);
 		return HIT;
 	} else {
 		self->misses++;
@@ -75,6 +76,7 @@ int cache_write_data(cache_t* self, metadata_t* metadata, char* data) {
 		free(block);
 		block = set_get_block(self->sets[index], metadata_get_tag(metadata));
 		block_set_data(block, data);
+		block_set_dirty(block, true);
 		return MISS;
 	}
 }

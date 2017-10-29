@@ -1,7 +1,7 @@
 #include "block.h"
 
 int block_create(block_t* self, int tag) {
-	self->data = malloc(block_size);
+	self->data = (char*) malloc(block_size);
 	if (!self->data) {
 		fprintf(stderr, "%s\n", "Error al alocar memoria para el bloque");
 		return ERROR;
@@ -34,6 +34,7 @@ bool block_get_valid_bit(block_t* self) {
 }
 
 int block_set_data(block_t* self, char* data) {
+	self->valid = true;
 	memcpy(self->data, data, block_size);
 	return SUCESS;
 }
