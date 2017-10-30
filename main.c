@@ -37,14 +37,48 @@ int write_byte(int address, char value) {
 	return -1;
 }
 
-int get_miss_rate() {
+float get_miss_rate() {
 	return cache_get_miss_rate(&cache);
 }
 
 int main(int argc, char* argv[]) { 
+	if (argc != 2) { return ERROR; }
+
 	init();
-	write_byte(0, 1);
-	printf("%d\n", read_byte(0));
-	/* Leer archivo parsear y operar */
+
+	FILE* file = fopen(argv[1], "rt");
+	if (!file) {
+		fprintf(stderr, "%s\n", "Error al abrir el archivo");
+		cache_destroy(&cache);
+		return ERROR;
+	}
+
+	char buffer[15];
+	int lines_counter = 0;
+	while (!feof(file)) {
+		if (fgets(buffer, 15, file) == NULL) { break; }
+		char operation = 0;
+		int address;
+		int value;
+		sscanf(buffer, "%c%d%d", &operation, &address, &value);
+		lines_counter++;
+		switch (operation) {
+			case 'R':
+				read_byte(address);
+				break;
+			case 'W':
+				write_byte(address, value);
+				break;
+			case 'M':
+				printf("%0.f\n", get_miss_rate());
+				break;
+			default:
+				if (operation == '\n') { continue; }
+				fprintf(stderr, "%s%d\n", "Comando invalido en la linea: ", lines_counter);
+				continue;
+		}
+	}
+	cache_destroy(&cache);
+	fclose(file);
 	return 0;
 }

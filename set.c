@@ -36,6 +36,7 @@ int set_insert_block(set_t* self, block_t* block) {
 		if (!self->blocks[i]) {
 			self->blocks[i] = (block_t*) malloc(sizeof(block_t));
 			memcpy(self->blocks[i], block, sizeof(block_t));
+			self->last_recent_used = i;
 			return SUCESS;
 		}
 	}

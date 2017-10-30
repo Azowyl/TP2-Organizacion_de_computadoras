@@ -18,8 +18,8 @@
 extern char memory[memory_size];
 
 typedef struct {
-	int access;
-	int misses;
+	float access;
+	float misses;
 	set_t* sets[set_count];
 } cache_t;
 
@@ -46,6 +46,6 @@ int cache_write_data(cache_t* self, metadata_t* info, char* data);
 
 // retorna el miss rate como el cociente entre misses y access
 // Pre: self inicializada con cache_create
-int cache_get_miss_rate(cache_t* self);
+float cache_get_miss_rate(cache_t* self);
 
 #endif /* __CACHE_H__ */

@@ -4,6 +4,7 @@ int cache_create(cache_t* self) {
 	int index = 0;
 	for (int i = 0; i < set_count; i++) {
 		self->sets[i] = (set_t*) malloc(sizeof(set_t));
+		memset(self->sets[i], 0, sizeof(set_t));
 		if (!self->sets[i]) {
 			fprintf(stderr, "%s%d\n", "Error al asingar memoria para el set: ", i);
 		} else {
@@ -47,7 +48,6 @@ int cache_read_data(cache_t* self, metadata_t* metadata, char* data) {
 	block_set_data(block, &memory[metadata_get_address(metadata)]);
 	set_insert_block(self->sets[index], block); // Allocate
 	block_get_data(block, metadata_get_offset(metadata), data);
-	block_destroy(block);
 	free(block);
 	return MISS;
 }
@@ -80,6 +80,6 @@ int cache_write_data(cache_t* self, metadata_t* metadata, char* data) {
 	}
 }
 
-int cache_get_miss_rate(cache_t* self) {
+float cache_get_miss_rate(cache_t* self) {
 	return (self->misses / self->access) * 100;
 }
