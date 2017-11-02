@@ -19,7 +19,7 @@ int read_byte(int address) {
 
 	int result = cache_read_data(&cache, &metadata, &byte_readed);
 	if (result == HIT) {
-		return (int)byte_readed; // <-- esto no se si esta bien
+		return (int)byte_readed;
 	}
 	// si no es un hit, cache_read_data se encarga de cargar el bloque
 	return -1;
