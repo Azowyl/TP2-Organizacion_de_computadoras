@@ -1,0 +1,704 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Definición del tipo de documento.                                           %
+% Posibles tipos de papel: a4paper, letterpaper, legalpapper                  %
+% Posibles tamaños de letra: 10pt, 11pt, 12pt                                 %
+% Posibles clases de documentos: article, report, book, slides                %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[a4paper,10pt]{article}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Los paquetes permiten ampliar las capacidades de LaTeX.                     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Paquete para inclusión de gráficos.
+\usepackage{graphicx}
+\usepackage{float}
+
+% Paquete para definir la codificación del conjunto de caracteres usado
+% (latin1 es ISO 8859-1).
+\usepackage[utf8]{inputenc}
+
+% Paquete para definir el idioma usado.
+\usepackage[spanish]{babel}
+
+% Define una macro para código
+\def\code#1{\texttt{#1}}
+
+\begin{document}
+% Título principal del documento.
+\title{\textbf{Trabajo Practico 2}}
+
+\maketitle
+
+	\begin{table}[h!]
+	  \centering
+	  \begin{tabular}{ccc}
+		\toprule
+		Apellido y Nombre & Padrón & Correo electrónico	\\
+		\midrule
+		Alvarez Avalos, Dylan Gustavo & 98225 & dylanalvarez1995@gmail.com\\
+		Gerstner, Facundo Agustin & 96255 & facugerstner\_29@hotmail.com\\
+		\bottomrule
+	  \end{tabular}
+	\end{table}
+
+    GitHub: https://github.com/Azowyl/TP2-Organizacion\_de\_computadoras
+
+\date{}
+\newpage
+
+% Quita el número en la primer página.
+\thispagestyle{empty}
+
+
+\section{Introducción}
+  
+   El objetivo del presente trabajo practico es familiarizarse con el funcionamiento de la memoria cache, a través de la implementación de un programa que simula una cache con determinadas características.
+
+
+\section{Implementación}
+    
+    La cache a simular es una cache asociativa por conjuntos de dos vías, de 4KB de capacidad, bloques de 32 bytes, política de remplazo LRU y política de escritura WB/WA. La memoria principal simulada tiene un tamaño de 64KB, por lo que el espacio de direcciones es de 16 bits.\\
+    Para la simulación de dicha cache, se implementaron diversas estructuras que representan las principales partes que participan en un sistema de memoria. A continuación se da una descripción breve de cada una de las estructuras utilizadas.\\
+    
+    \subsection{block\_t}
+        Representa un bloque de cache. El mismo contiene un tag especifico, 4 bytes que representan la información guardada en el bloque y además contiene dos campos booleanos que representan los bits valid y dirty.\\
+    
+    \subsection{metadata\_t}
+        Representa la información contenida en una dirección de memoria y permite acceder a los distintos campos que la componen. Posee funciones que calculan el tag, el index y el offset, dada una dirección.\\
+        
+    \subsection{set\_t}
+        Representa un set de la cache. Permite agregar y obtener bloques a partir de un tag. Cuando se inserta un bloque esta estructura es la encargada de aplicar tanto la política de remplazo (LRU) como la de escritura (WB).\\
+        
+    \subsection{cache\_t}
+        Representa la cache y permite la escritura y lectura de la misma. Es la estructura encargada de organizar los sets y los bloques y de llevar un contador de misses y accesos, con los cuales es capaz de calcular el miss rate.\\\\
+    
+    A partir de estas estructuras se implementaron las funciones requeridas en el trabajo, las cuales se comunican con la estructura cache, llamando a sus respectivas funciones.\\
+    
+    Los siguientes diagramas representan la secuencia que se ejecuta cuando se realiza una lectura y una escritura sobre la estructura cache. La figura 3 muestra las políticas de reemplazo y escritura, cuando se le solicita a la estructura set que inserte un bloque.
+    
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale=0.4]{DS_cache_read.png}
+        \caption{Cache read}
+        \label{fig:my_label}
+    \end{figure}
+    
+     \begin{figure}[H]
+        \centering
+        \includegraphics[scale=0.4]{DS_cache_write.png}
+        \caption{Cache write}
+        \label{fig:my_label}
+    \end{figure}
+    
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale=0.4]{DS_set_insert.png}
+        \caption{Write back / LRU}
+        \label{fig:my_label}
+    \end{figure}
+    
+    \subsection{Consideraciones}
+    
+    \subsubsection{Proceso de compilación}
+        El programa fue compilado con gcc (Ubuntu 5.4.0-6ubuntu1~16.04.4) 5.4.0 20160609. El comando utilizado fue:
+    \begin{verbatim}
+        root@:~# gcc -Wall -Werror -pedantic -std=c99 -o tp main.c
+        set.c cache.c metadata.c block.c
+    \end{verbatim}
+    
+    Se utilizaron dichas directivas con el objetivo de respetar el estándar 99 de c y evitar warnings.
+    
+    \subsection{Criterios}
+        Se tomaron 0 y -1 como códigos de éxito y error respectivamente. Además las funciones read y write de la estructura cache retornan 0 y -2, informando hit o miss respectivamente.\\
+        Se tomó como salida de errores la estándar (stderr), donde los errores que se pueden imprimir son errores de archivos.\\
+        Las variables que representan a la memoria principal y a la cache fueron declaradas como globales con el fin de facilitar la simulación de la cache.
+
+\section{Casos de prueba}
+
+    Se realizaron mediciones sobre el programa con distintos archivos de prueba. A continuación se muestra el comando ejecutado y la salida de cada uno de ellos.
+    \begin{itemize}
+        \item ./tp prueba1.mem\\
+        Salida: 57\\
+        echo \$? retorno 0\\
+        \item ./tp prueba2.mem\\
+        Salida: 50\\
+        echo \$? retorno 0\\
+        \item ./tp prueba3.mem\\
+        Salida: 20\\
+        echo \$? retorno 0\\
+        \item ./tp prueba4.mem\\
+        Salida: 29\\
+        echo \$? retorno 0\\
+        \item ./tp prueba5.mem\\
+        Salida: 67\\
+        echo \$? retorno 0\\
+    \end{itemize}
+    
+    Adicionalmente se ejecutaron cada uno de los comandos anteriores con valgrind, con el fin de chequear errores de memoria. El comando utilizado fue:
+    \begin{verbatim}
+        valgrind --leak-check=full --leak-resolution=med 
+        --track-origins=yes --show-reachable=yes ./tp prueba1.mem
+    \end{verbatim}
+    
+    El programa mostró un funcionamiento correcto, sin errores. Los valores de miss rate obtenidos en cada caso son los esperados, de acuerdo a los accesos solicitados por cada archivo de prueba.\\
+    
+\section{Conclusiones}
+   Este tipo de simulaciones no es demasiado difícil de implementar, y puede ser muy útil para el diseño de la jerarquía de memoria de una computadora, ya que junto a algoritmos típicos de benchmark puede dar una buena aproximación de la performance de un sistema de jerarquía de memorias para algún tipo de operación en particular.\\
+   
+   Es decir, el cálculo teórico de variables tales como el tiempo de ejecución solo puede llegar a un resultado concreto asumiendo la cantidad de accesos a memoria, y cuán secuencial o aleatorio es el uso de la misma, además de que es menos dinámico que el cálculo del miss rate utilizando profilers.\\
+   
+   Por ejemplo, si tuviéramos un profiler que dado un algoritmo generara un archivo de log con el formato que espera esta aplicación, este mismo simulador puede llegar a ser útil para tomar una decisión. Con esa idea en mente es que se parametrizó, por ejemplo, la cantidad de vías. Con solo reemplazar un par de macros se puede probar el resultado para distintas configuraciones. El siguiente paso, si se fuera a usar esta aplicación profesionalmente, sería por ejemplo tomar estos parámetros en una función, de modo tal que se corra este algoritmo para distintas asociatividades y políticas de reemplazo y se use el output para generar gráficos.
+
+\section{Apéndice}
+A continuación se presenta el código escrito para el presente trabajo.\\
+
+\subsection{main.c}
+\begin{verbatim}
+
+    #include "cache.h"
+    
+    #define memory_size 65536 // 64K
+    
+    char memory[memory_size];
+    cache_t cache;
+    
+    void init() { 
+    	   cache_create(&cache);
+    	   for (int i = 0; i < memory_size; i++) {
+    	    memory[i] = 0;
+        }
+    }
+    
+    int read_byte(int address) {
+    	char byte_readed;
+    	metadata_t metadata;
+    	metadata_create(&metadata, address);
+    
+    	int result = cache_read_data(&cache, &metadata, &byte_readed);
+    	if (result == HIT) {
+    		return (int)byte_readed;
+    	}
+    	// si no es un hit, cache_read_data se encarga de cargar el bloque
+    	return -1;
+    }
+    
+    int write_byte(int address, char value) {
+    	metadata_t metadata;
+    	metadata_create(&metadata, address);
+    
+    	int result = cache_write_data(&cache, &metadata, &value);
+    	if (result == HIT) {
+    		return 0;
+    	}
+    	// si no es un hit, cache_write_data se encarga de cargar el bloque
+    	return -1;
+    }
+    
+    float get_miss_rate() {
+    	return cache_get_miss_rate(&cache);
+    }
+    
+    int main(int argc, char* argv[]) { 
+    	if (argc != 2) { return ERROR; }
+    
+    	init();
+    
+    	FILE* file = fopen(argv[1], "rt");
+    	if (!file) {
+    		fprintf(stderr, "%s\n", "Error al abrir el archivo");
+    		cache_destroy(&cache);
+    		return ERROR;
+    	}
+    
+    	char buffer[15];
+    	int lines_counter = 0;
+    	while (!feof(file)) {
+    		if (fgets(buffer, 15, file) == NULL) { break; }
+    		char operation = 0;
+    		int address;
+    		int value;
+    		sscanf(buffer, "%c%d%d", &operation, &address, &value);
+    		lines_counter++;
+    		switch (operation) {
+    			case 'R':
+    				read_byte(address);
+    				break;
+    			case 'W':
+    				write_byte(address, value);
+    				break;
+    			case 'M':
+    				printf("%0.f\n", get_miss_rate());
+    				break;
+    			default:
+    				if (operation == '\n') { continue; }
+    				fprintf(stderr, "%s%d\n", "Comando invalido en la linea: ", lines_counter);
+    				continue;
+    		}
+    	}
+    	cache_destroy(&cache);
+    	fclose(file);
+    	return 0;
+    }
+\end{verbatim}
+ 
+ \subsection{block \_t}
+ \subsubsection{block.h}
+ \begin{verbatim}
+#ifndef __BLOCK_H__
+#define __BLOCK_H__
+
+#include <stdbool.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+#define block_size 4 // bytes
+#define ERROR -1
+#define SUCESS 0
+
+typedef struct {
+	char* data;
+	int tag;
+	bool valid;
+	bool dirty;
+} block_t;
+
+// inicializa un bloque de cache
+// Pre: self apunta a un sector valido de memoria
+int block_create(block_t* self, int tag);
+
+// destruye self liberando sus recursos
+// Pre: self inicializada con block_create
+int block_destroy(block_t* self);
+
+bool block_get_dirty_bit(block_t* self);
+
+bool block_get_valid_bit(block_t* self);
+
+void block_set_dirty(block_t* self, bool is_dirty);
+
+// retorna el tag asignado, -1 si no tiene tag
+// Pre: self inicializada con block_create
+int block_get_tag(block_t* self);
+
+// guarda data en el bloque
+// Pre: self inicializada con block_create
+// data apunta a un sector valido de memoria y
+// tiene un tamaño mayor o igual a block_size
+int block_set_data(block_t* self, char* data);
+
+// Pre: self inicializada con block_create
+// data apunta a un sector valido de memoria
+int block_get_data(block_t* self, int offset, char* data);
+
+#endif /* __BLOCK_H__ */
+ \end{verbatim}
+ 
+ \subsubsection{block.c}
+ \begin{verbatim}
+#include "block.h"
+
+int block_create(block_t* self, int tag) {
+	self->data = (char*) malloc(block_size);
+	if (!self->data) {
+		fprintf(stderr, "%s\n", "Error al alocar memoria para el bloque");
+		return ERROR;
+	}
+	memset(self->data, 0, block_size);
+	self->tag = tag;
+	self->dirty = false;
+	self->valid = false;
+	return SUCESS;
+}
+
+int block_destroy(block_t* self) {
+	if (self->data) { free(self->data); }
+	self->tag = 0;
+	self->dirty = false;
+	self->valid = false;
+	return SUCESS;
+}
+
+int block_get_tag(block_t* self) {
+	return self->tag;
+}
+
+bool block_get_dirty_bit(block_t* self) {
+	return self->dirty;
+}
+
+bool block_get_valid_bit(block_t* self) {
+	return self->valid;
+}
+
+int block_set_data(block_t* self, char* data) {
+	self->valid = true;
+	memcpy(self->data, data, block_size);
+	return SUCESS;
+}
+
+int block_get_data(block_t* self, int offset, char* data) {
+	if (offset < 0 || offset > 4) { return ERROR; }
+	memcpy(data, &self->data[offset], 1);
+	return SUCESS;
+}
+
+void block_set_dirty(block_t* self, bool is_dirty) {
+	self->dirty = is_dirty;
+}
+
+ \end{verbatim}
+  
+  \subsection{set\_t}
+  \subsubsection{set.h}
+  \begin{verbatim}
+#ifndef __SET_H__
+#define __SET_H__
+
+#include <stdbool.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+#include "block.h"
+#include "metadata.h"
+
+#define block_count 2 // 2WSA
+#define memory_size 65536 // 64K
+
+extern char memory[memory_size];
+
+typedef struct {
+	int index;
+	block_t* blocks[block_count];
+	int last_recent_used;
+} set_t;
+
+// inicializa la estructura para ser utilziada
+// Pre: self apunta a un sector valido de memoria
+int set_create(set_t* self, int index);
+
+// destruye la estructura liberando sus recursos
+// Pre: self inicializada con set_create
+int set_destroy(set_t* self);
+
+// devuelve el block correspondiente al tag
+// NULL si no contiene un bloque con el tag especificado
+// Pre: self inicializada con set_create
+block_t* set_get_block(set_t* self, int tag);
+
+int set_insert_block(set_t* self, block_t* block);
+
+#endif /* __SET_H__ */
+
+  \end{verbatim}
+  \subsubsection{set.c}
+  \begin{verbatim}
+#include "set.h"
+
+int set_create(set_t* self, int index) {
+	self-> index = index;
+	for (int i = 0; i < block_count; i++) {
+		self->blocks[i] = NULL;
+	}
+	return SUCESS;
+}
+
+int set_destroy(set_t* self) {
+	for (int i = 0; i < block_count; i++) {
+		if (self->blocks[i]) {
+			block_destroy(self->blocks[i]);	
+			free(self->blocks[i]);
+		}
+	}
+	self->index = -1;
+	return SUCESS;
+}
+
+block_t* set_get_block(set_t* self, int tag) {
+	for (int i = 0; i < block_count; i++) {
+		if (self->blocks[i]) {
+			if (block_get_tag(self->blocks[i]) == tag) {
+			self->last_recent_used = i;
+			return self->blocks[i];
+			}
+		}
+	}
+	return NULL;
+}
+
+int set_insert_block(set_t* self, block_t* block) {
+	for (int i = 0; i < block_count; i++) {
+		if (!self->blocks[i]) {
+			self->blocks[i] = (block_t*) malloc(sizeof(block_t));
+			memcpy(self->blocks[i], block, sizeof(block_t));
+			self->last_recent_used = i;
+			return SUCESS;
+		}
+	}
+
+	// LRU
+	int index;
+	if (self->last_recent_used == 0) {
+		// remplaza el segundo
+		index = 1;
+	} else { index = 0; }
+
+	// Write Back
+	if (block_get_dirty_bit(self->blocks[index])) { 
+		// si esta dirty lo escribe en memoria
+		for (int i = 0; i < block_size; i++) {
+			// se esbriben 4 bytes comenzando en address con offset 0 
+			int address = metadata_build(block_get_tag(self->blocks[index]), self->index, 0);
+			block_get_data(self->blocks[index], i, &memory[address]);
+		}
+	}
+	block_destroy(self->blocks[index]);
+	memcpy(self->blocks[index], block, sizeof(block_t));
+	return SUCESS;
+}
+	
+  \end{verbatim}
+  
+  \subsection{cache\_t}
+  \subsubsection{cache.h}
+  \begin{verbatim}
+#ifndef __CACHE_H__
+#define __CACHE_H__
+
+#include <stdbool.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+#include "metadata.h"
+#include "set.h"
+
+#define set_count 512 // cache 2WSA de 4KB con bloques de 4B
+#define memory_size 65536 // 64K
+
+#define HIT 0
+#define MISS -2
+
+extern char memory[memory_size];
+
+typedef struct {
+	float access;
+	float misses;
+	set_t* sets[set_count];
+} cache_t;
+
+// inicializa la cache
+// Pre: self apunta a un sector valido de memoria
+int cache_create(cache_t* self);
+
+// destruye la cache liberando sus recursos
+// Pre: self inicializada con cache_create
+int cache_destroy(cache_t* self);
+
+// carda en data, la informacion del bloque direcciondo por info.
+// retorna HIT o MISS dependiendo si estaba o no el bloque en cache
+// Pre: self inicializada con cache_create,
+// info contiene tag, index, y block offset
+// data apunta a un sector valido de memoria
+int cache_read_data(cache_t* self, metadata_t* info, char* data);
+
+// guarda en el bloque identificado por info, 4 bytes comenzando desde data.
+// retorna HIT o MISS dependiendo si estaba o no el bloque en cache
+// Pre: self inicializada con cache_create,
+// info contiene tag, index, y block offset
+int cache_write_data(cache_t* self, metadata_t* info, char* data);
+
+// retorna el miss rate como el cociente entre misses y access
+// Pre: self inicializada con cache_create
+float cache_get_miss_rate(cache_t* self);
+
+#endif /* __CACHE_H__ */
+  \end{verbatim}
+  \subsubsection{cache.c}
+  \begin{verbatim}
+#include "cache.h"
+
+int cache_create(cache_t* self) {
+	int index = 0;
+	for (int i = 0; i < set_count; i++) {
+		self->sets[i] = (set_t*) malloc(sizeof(set_t));
+		memset(self->sets[i], 0, sizeof(set_t));
+		if (!self->sets[i]) {
+			fprintf(stderr, "%s%d\n", "Error al asingar memoria para el set: ", i);
+		} else {
+			set_create(self->sets[i], index++);		
+		}
+	}
+	return SUCESS;
+}
+
+int cache_destroy(cache_t* self) {
+	for (int i = 0; i < set_count; i++) {
+		if (self->sets[i]) {
+			set_destroy(self->sets[i]);	
+			free(self->sets[i]);
+		}
+	}
+	return SUCESS;
+}	
+
+int cache_read_data(cache_t* self, metadata_t* metadata, char* data) {
+	self->access++;
+
+	int index = metadata_get_index(metadata);
+	if (index < 0 || index > set_count) {
+		return ERROR;
+	}
+
+	block_t* block = set_get_block(self->sets[index], metadata_get_tag(metadata));
+
+	if (block) {
+		if (block_get_valid_bit(block)) {
+			block_get_data(block, metadata_get_offset(metadata), data);
+			return HIT;	
+		}
+	}
+	// MISS
+	self->misses++;
+	
+	block = (block_t*) malloc(sizeof(block_t));
+	block_create(block, metadata_get_tag(metadata));
+	block_set_data(block, &memory[metadata_get_address(metadata)]);
+	set_insert_block(self->sets[index], block); // Allocate
+	block_get_data(block, metadata_get_offset(metadata), data);
+	free(block);
+	return MISS;
+}
+
+int cache_write_data(cache_t* self, metadata_t* metadata, char* data) {
+	self->access++;
+
+	int index = metadata_get_index(metadata);
+	if (index < 0 || index > set_count) {
+		return ERROR;
+	}
+
+	block_t* block = set_get_block(self->sets[index], metadata_get_tag(metadata));
+	if (block) {
+		block_set_data(block, data);
+		block_set_dirty(block, true);
+		return HIT;
+	} else {
+		// MISS
+		self->misses++;
+
+		block = (block_t*) malloc(sizeof(block_t));
+		block_create(block, metadata_get_tag(metadata));
+		block_set_data(block, data);
+		block_set_dirty(block, true);
+		set_insert_block(self->sets[index], block); // Write Allocate
+		free(block);
+		
+		return MISS;
+	}
+}
+
+float cache_get_miss_rate(cache_t* self) {
+	return (self->misses / self->access) * 100;
+}
+
+   \end{verbatim}
+
+    \subsection{metadata\_t}
+    \subsubsection{metadata.h}
+    \begin{verbatim}
+#ifndef __METADATA_H__
+#define __METADATA_H__
+
+#include <stdbool.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+#define metadata_bit_count 16
+
+#define tag_size 5
+#define index_size 9
+#define offset_size 2
+
+#define SUCESS 0
+#define ERROR -1
+
+typedef struct {
+	unsigned short int metadata;
+} metadata_t;
+
+// inicializa self con metadata
+// Pre: self apunta a un sector valido de memoria
+int metadata_create(metadata_t* self, unsigned short int address);
+
+// inicializa self
+// Pre: self inicializada con metadata_create
+int metadata_destroy(metadata_t* self);
+
+// Pre: self inicializada con metadata_create
+int metadata_get_tag(metadata_t* self);
+
+// Pre: self inicializada con metadata_create
+int metadata_get_index(metadata_t* self);
+
+// retorna el offset, puede ser 0, 1, 2 o 3
+// Pre: self inicializada con metadata_create
+int metadata_get_offset(metadata_t* self);
+
+// Pre: self inicializada con metadata_create
+unsigned short int metadata_get_address(metadata_t* self);
+
+// construye una direccion a partir de los parametros
+int metadata_build(int tag, int index, int offset);
+
+#endif /* __METADATA_H__ */
+    \end{verbatim}
+    \subsubsection{metadata.c}
+    \begin{verbatim}
+#include "metadata.h"
+
+int metadata_create(metadata_t* self, unsigned short int address) {
+	self->metadata = address;
+	return SUCESS;
+}
+
+int metadata_destroy(metadata_t* self) { return SUCESS; }
+
+int metadata_get_tag(metadata_t* self) {
+	return self->metadata >> (index_size + offset_size);
+}
+
+int metadata_get_index(metadata_t* self) {
+	unsigned short int index = self->metadata << tag_size;
+	index = index >> (tag_size + offset_size);
+
+	return index;
+}
+
+int metadata_get_offset(metadata_t* self) {
+	unsigned short int offset = self->metadata << (index_size + tag_size);
+
+	return (offset >> (index_size + tag_size));
+}
+
+unsigned short int metadata_get_address(metadata_t* self) {
+	return self->metadata;
+}
+
+int metadata_build(int tag, int index, int offset) {
+	unsigned short int address = tag;
+	address = address << (offset_size + index_size);
+
+	address += index;
+	address = address << offset_size;	
+
+	address += offset;
+
+	return address;
+}
+    \end{verbatim}
+\end{document}
